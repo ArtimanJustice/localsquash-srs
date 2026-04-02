@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LocalSquash — SRS | ПЗПІ-25-2</title>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0c0f14;
+      --surface: #151921;
+      --surface2: #1c2230;
+      --border: #2a3040;
+      --text: #e2e6ed;
+      --text-dim: #8891a4;
+      --accent: #3b82f6;
+      --accent-glow: rgba(59,130,246,0.15);
+      --green: #22c55e;
+      --yellow: #eab308;
+      --orange: #f97316;
+      --red: #ef4444;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Outfit', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .grain {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      pointer-events: none; z-index: 999;
+      opacity: 0.03;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    }
+
+    .hero {
+      min-height: 50vh;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      text-align: center;
+      padding: 80px 24px 60px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute; top: -200px; left: 50%; transform: translateX(-50%);
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(59,130,246,0.08) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 100px; padding: 6px 16px;
+      font-size: 13px; color: var(--text-dim);
+      font-family: 'JetBrains Mono', monospace;
+      margin-bottom: 32px;
+      animation: fadeIn 0.6s ease;
+    }
+
+    .badge .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); }
+
+    .hero h1 {
+      font-size: clamp(48px, 8vw, 84px);
+      font-weight: 800;
+      letter-spacing: -2px;
+      line-height: 1;
+      margin-bottom: 16px;
+      animation: fadeUp 0.7s ease;
+    }
+
+    .hero h1 span { color: var(--accent); }
+
+    .hero p.subtitle {
+      font-size: clamp(16px, 2.5vw, 22px);
+      color: var(--text-dim);
+      font-weight: 300;
+      max-width: 600px;
+      animation: fadeUp 0.8s ease;
+    }
+
+    .team-strip {
+      display: flex; gap: 12px; flex-wrap: wrap; justify-content: center;
+      margin-top: 32px;
+      animation: fadeUp 0.9s ease;
+    }
+
+    .team-strip .chip {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 16px;
+      font-size: 14px;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--text-dim);
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0 24px 80px;
+    }
+
+    .section { margin-bottom: 48px; }
+
+    .section-header {
+      display: flex; align-items: center; gap: 12px;
+      margin-bottom: 24px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .section-header .num {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px; color: var(--accent);
+      background: var(--accent-glow);
+      padding: 4px 10px; border-radius: 6px;
+    }
+
+    .section-header h2 {
+      font-size: 22px; font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+
+    .section p, .section li {
+      color: var(--text-dim);
+      font-size: 15px;
+      margin-bottom: 8px;
+    }
+
+    .section p strong { color: var(--text); font-weight: 600; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+      margin: 16px 0;
+    }
+
+    thead th {
+      background: var(--surface2);
+      color: var(--text);
+      font-weight: 600;
+      text-align: left;
+      padding: 12px 16px;
+      border-bottom: 2px solid var(--accent);
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    tbody td {
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-dim);
+      vertical-align: top;
+    }
+
+    tbody tr:hover { background: var(--surface); }
+
+    .priority {
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 100px;
+      font-size: 12px;
+      font-weight: 600;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .priority.must { background: rgba(239,68,68,0.15); color: var(--red); }
+    .priority.should { background: rgba(234,179,8,0.15); color: var(--yellow); }
+    .priority.could { background: rgba(34,197,94,0.15); color: var(--green); }
+
+    .req-id {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px; color: var(--accent);
+      font-weight: 700;
+    }
+
+    .glossary-term {
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    .info-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      margin: 16px 0;
+    }
+
+    .footer {
+      text-align: center;
+      padding: 40px 24px;
+      border-top: 1px solid var(--border);
+      color: var(--text-dim);
+      font-size: 13px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+    @media (max-width: 600px) {
+      .hero { padding: 60px 16px 40px; }
+      table { font-size: 13px; }
+      thead th, tbody td { padding: 8px 10px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="grain"></div>
+
+  <section class="hero">
+    <div class="badge"><span class="dot"></span> ПЗ 01 — Інженерія вимог</div>
+    <h1>Local<span>Squash</span></h1>
+    <p class="subtitle">Браузерний сервіс для стиснення та конвертації відео, зображень та аудіо без завантаження файлів на сервер</p>
+    <div class="team-strip">
+      <div class="chip">Петров Д.О.</div>
+      <div class="chip">Григор'Єва Д.О.</div>
+      <div class="chip">Плига Є.М.</div>
+      <div class="chip">ПЗПІ-25-2</div>
+    </div>
+  </section>
+
+  <div class="container">
+
+    <!-- 1. ВСТУП -->
+    <div class="section">
+      <div class="section-header">
+        <span class="num">01</span>
+        <h2>Вступ (Introduction)</h2>
+      </div>
+      <p>
+        <strong>LocalSquash</strong> — це безкоштовний браузерний веб-сервіс для стиснення та конвертації відео, зображень та аудіофайлів.
+        Ключова особливість: вся обробка відбувається локально на пристрої користувача за допомогою FFmpeg, скомпільованого у WebAssembly (WASM).
+        Файли ніколи не завантажуються на сервер, що гарантує повну приватність.
+      </p>
+      <p>
+        <strong>Проблема:</strong> існуючі хмарні компресори порушують приватність, мають обмеження на розмір файлів та потребують інтернет-з'єднання;
+        десктопні рішення складні для звичайних користувачів.
+      </p>
+      <p>
+        <strong>Цільова аудиторія:</strong> веб-розробники, контент-мейкери та звичайні користувачі (вік 18–50, технічний рівень від базового до просунутого).
+      </p>
+    </div>
+
+    <!-- 2. ЗАГАЛЬНИЙ ОПИС -->
+    <div class="section">
+      <div class="section-header">
+        <span class="num">02</span>
+        <h2>Загальний опис (Overall Description)</h2>
+      </div>
+      <p>
+        <strong>Актори:</strong> Єдина роль — анонімний користувач. Реєстрація та авторизація відсутні. Всі функції доступні одразу без створення облікового запису.
+      </p>
+      <p>
+        <strong>Функціональні блоки:</strong> компресор відео (MP4, MOV, WebM, AVI, MKV), компресор зображень (JPEG, PNG, WebP, HEIC, TIFF, BMP, GIF),
+        компресор аудіо (MP3, WAV, FLAC, AAC), конвертер форматів.
+      </p>
+      <p>
+        <strong>Зовнішні залежності:</strong> FFmpeg.wasm (WebAssembly-порт FFmpeg), CDN для роздачі статичних файлів. Серверна частина відсутня — повністю клієнтський SPA.
+      </p>
+    </div>
+
+    <!-- 3. ФУНКЦІОНАЛЬНІ ВИМОГИ -->
+    <div class="section">
+      <div class="section-header">
+        <span class="num">03</span>
+        <h2>Функціональні вимоги (Functional Requirements)</h2>
+      </div>
+      <table>
+        <thead>
+          <tr><th>ID</th><th>Пріоритет</th><th>Опис вимоги</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="req-id">FR-01</td><td><span class="priority must">Must</span></td><td>Система дозволяє стиснення відеофайлів форматів MP4, MOV, WebM, AVI, MKV, WMV, FLV з налаштуванням якості через параметр CRF (18–35).</td></tr>
+          <tr><td class="req-id">FR-02</td><td><span class="priority must">Must</span></td><td>Система дозволяє стиснення зображень форматів JPEG, PNG, WebP, HEIC, TIFF, BMP, GIF з налаштуванням якості від 1 до 100%.</td></tr>
+          <tr><td class="req-id">FR-03</td><td><span class="priority must">Must</span></td><td>Система дозволяє стиснення аудіофайлів форматів MP3, WAV, FLAC, AAC з налаштуванням бітрейту від 32 до 320 kbps.</td></tr>
+          <tr><td class="req-id">FR-04</td><td><span class="priority must">Must</span></td><td>Система дозволяє конвертацію між підтримуваними форматами (MOV→MP4, PNG→WebP, WAV→MP3 тощо).</td></tr>
+          <tr><td class="req-id">FR-05</td><td><span class="priority must">Must</span></td><td>Користувач може завантажити файл через drag-and-drop або через діалог вибору файлу.</td></tr>
+          <tr><td class="req-id">FR-06</td><td><span class="priority must">Must</span></td><td>Система відображає розмір файлу до та після стиснення з відсотком зменшення.</td></tr>
+          <tr><td class="req-id">FR-07</td><td><span class="priority should">Should</span></td><td>Система надає функції обрізки відео та аудіо (trim) за часовими мітками.</td></tr>
+          <tr><td class="req-id">FR-08</td><td><span class="priority should">Should</span></td><td>Система надає функції кадрування (crop) та зміни роздільності (resize) для відео та зображень.</td></tr>
+          <tr><td class="req-id">FR-09</td><td><span class="priority should">Should</span></td><td>Система дозволяє видалення метаданих EXIF із зображень для захисту приватності.</td></tr>
+          <tr><td class="req-id">FR-10</td><td><span class="priority could">Could</span></td><td>Система підтримує пакетну обробку кількох файлів одночасно.</td></tr>
+          <tr><td class="req-id">FR-11</td><td><span class="priority must">Must</span></td><td>Вся обробка файлів відбувається локально в браузері; файли не передаються на зовнішній сервер.</td></tr>
+          <tr><td class="req-id">FR-12</td><td><span class="priority must">Must</span></td><td>Користувач може завантажити результат стиснення/конвертації на свій пристрій.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 4. НЕФУНКЦІОНАЛЬНІ ВИМОГИ -->
+    <div class="section">
+      <div class="section-header">
+        <span class="num">04</span>
+        <h2>Нефункціональні вимоги (Non-Functional Requirements)</h2>
+      </div>
+      <table>
+        <thead>
+          <tr><th>ID</th><th>Опис вимоги</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="req-id">NFR-P-01</td><td>Час завантаження сторінки (First Contentful Paint) не перевищує 3 секунди на з'єднанні 10 Мбіт/с.</td></tr>
+          <tr><td class="req-id">NFR-P-02</td><td>Ініціалізація FFmpeg WASM модуля відбувається не довше ніж за 5 секунд.</td></tr>
+          <tr><td class="req-id">NFR-P-03</td><td>Стиснення зображення розміром 5 МБ займає не більше 5 секунд на сучасному пристрої.</td></tr>
+          <tr><td class="req-id">NFR-S-01</td><td>Усі з'єднання з сайтом захищені HTTPS (TLS 1.2+).</td></tr>
+          <tr><td class="req-id">NFR-S-02</td><td>Файли користувача ніколи не передаються за межі браузера (клієнтська обробка).</td></tr>
+          <tr><td class="req-id">NFR-S-03</td><td>Впроваджено Content Security Policy (CSP) заголовки для захисту від XSS-атак.</td></tr>
+          <tr><td class="req-id">NFR-U-01</td><td>Інтерфейс адаптивний (responsive): коректне відображення на екранах від 320px до 2560px.</td></tr>
+          <tr><td class="req-id">NFR-U-02</td><td>Новий користувач може стиснути перший файл за 3 кліки або менше без інструкцій.</td></tr>
+          <tr><td class="req-id">NFR-R-01</td><td>Доступність хостингу ≥ 99.9% (статичний сайт на CDN).</td></tr>
+          <tr><td class="req-id">NFR-R-02</td><td>Після першого завантаження сервіс працює повністю офлайн (WASM-модуль кешується).</td></tr>
+          <tr><td class="req-id">NFR-C-01</td><td>Система підтримує файли розміром до 2 ГБ (обмежено RAM пристрою).</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 5. ОБМЕЖЕННЯ -->
+    <div class="section">
+      <div class="section-header">
+        <span class="num">05</span>
+        <h2>Обмеження (Constraints)</h2>
+      </div>
+      <table>
+        <thead>
+          <tr><th>ID</th><th>Опис обмеження</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="req-id">C-01</td><td>Додаток реалізується як SPA (Single Page Application) без серверної частини.</td></tr>
+          <tr><td class="req-id">C-02</td><td>Обробка медіа виконується виключно через FFmpeg.wasm (WebAssembly).</td></tr>
+          <tr><td class="req-id">C-03</td><td>Розгортання на статичному хостингу (Vercel, Netlify або GitHub Pages).</td></tr>
+          <tr><td class="req-id">C-04</td><td>Підтримка браузерів: Chrome 80+, Firefox 78+, Safari 14+, Edge 80+ (вимога WebAssembly та SharedArrayBuffer).</td></tr>
+          <tr><td class="req-id">C-05</td><td>Без реєстрації та авторизації — повністю анонімний доступ.</td></tr>
+          <tr><td class="req-id">C-06</td><td>MVP має бути готовий за 2 місяці від дати початку розробки.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 6. ГЛОСАРІЙ -->
+    <div class="section">
+      <div class="section-header">
+        <span class="num">06</span>
+        <h2>Глосарій (Glossary)</h2>
+      </div>
+      <table>
+        <thead>
+          <tr><th>Термін</th><th>Визначення</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="glossary-term">FFmpeg.wasm</td><td>WebAssembly-порт мультимедійного фреймворку FFmpeg для обробки медіа в браузері.</td></tr>
+          <tr><td class="glossary-term">WebAssembly</td><td>Бінарний формат інструкцій для виконання коду з продуктивністю, близькою до нативної, у браузері.</td></tr>
+          <tr><td class="glossary-term">CRF</td><td>Constant Rate Factor — параметр якості відео H.264; нижчі значення (18–23) = вища якість, вищі (28–35) = менший розмір.</td></tr>
+          <tr><td class="glossary-term">SPA</td><td>Single Page Application — односторінковий веб-додаток, що завантажується один раз і оновлюється динамічно.</td></tr>
+          <tr><td class="glossary-term">CDN</td><td>Content Delivery Network — мережа розподілу контенту для швидкої доставки статичних файлів.</td></tr>
+          <tr><td class="glossary-term">EXIF</td><td>Метадані зображення (геолокація, камера, дата зйомки), видалення яких підвищує приватність.</td></tr>
+          <tr><td class="glossary-term">Drag-and-drop</td><td>Спосіб завантаження файлу шляхом перетягування з файлового менеджера у вікно браузера.</td></tr>
+          <tr><td class="glossary-term">CSP</td><td>Content Security Policy — HTTP-заголовок безпеки, який захищає від XSS та ін'єкцій коду.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 7. МАТРИЦЯ ВІДСТЕЖУВАНОСТІ -->
+    <div class="section">
+      <div class="section-header">
+        <span class="num">07</span>
+        <h2>Матриця відстежуваності (Traceability Matrix)</h2>
+      </div>
+      <table>
+        <thead>
+          <tr><th>Вимога</th><th>Джерело</th><th>Тест-критерій</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="req-id">FR-01</td><td>П. 2.1 (основні дії)</td><td>Завантажити MP4 100 МБ, стиснути з CRF 28, перевірити зменшення ≥ 50%.</td></tr>
+          <tr><td class="req-id">FR-02</td><td>П. 2.1 (основні дії)</td><td>Завантажити JPEG 5 МБ, стиснути до 70%, перевірити зменшення та якість.</td></tr>
+          <tr><td class="req-id">FR-04</td><td>П. 2.2 (обов'язкові)</td><td>Конвертувати MOV→MP4, PNG→WebP — перевірити коректність файлу.</td></tr>
+          <tr><td class="req-id">FR-05</td><td>П. 2.4 (сценарій)</td><td>Перетягнути файл у drag-and-drop зону, перевірити прийом файлу.</td></tr>
+          <tr><td class="req-id">FR-11</td><td>П. 5.2 (неприйнятне)</td><td>DevTools Network: жодних вихідних запитів з медіаданими.</td></tr>
+          <tr><td class="req-id">NFR-P-01</td><td>П. 3.2 (час відгуку)</td><td>Lighthouse: FCP < 3 с на 10 Мбіт/с.</td></tr>
+          <tr><td class="req-id">NFR-U-02</td><td>П. 3.4 (пристрої)</td><td>Юзабіліті-тест: 5 користувачів стискають файл за ≤ 3 кліки.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <footer class="footer">
+    ПЗПІ-25-2 · Петров Д.О., Григор'Єва Д.О., Плига Є.М. · 2026
+  </footer>
+</body>
+</html>
